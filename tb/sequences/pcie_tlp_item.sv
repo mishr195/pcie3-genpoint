@@ -269,6 +269,13 @@ class pcie_tlp_item extends uvm_sequence_item;
         };
     }
 
+    constraint c_clean_default {
+        soft td == 0;
+        soft ep == 0;
+        soft inject_lcrc_error == 0;
+        soft inject_ecrc_error == 0;
+    }
+
     constraint c_ecrc_td    { if (!td) inject_ecrc_error == 0; }
 
     constraint c_bdf_range {

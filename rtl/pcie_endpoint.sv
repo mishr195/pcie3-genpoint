@@ -110,6 +110,10 @@ module pcie_endpoint #(
     logic [15:0] rx_rid;
     logic [31:0] rx_addr;
     logic [3:0]  rx_fbe;
+    logic [7:0]  cpl_tag;
+    logic [15:0] cpl_rid;
+    logic [31:0] cpl_addr;
+    logic        cpl_is_cfgrd;
 
     logic is_cfgrd, is_cfgwr, is_memrd, is_memwr, is_4dw_mem;
 
@@ -163,6 +167,10 @@ module pcie_endpoint #(
         if (!rst_n || !link_up) begin
             tx_st    <= TX_IDLE;
             tx_cpl_has_data <= 1'b0;
+            cpl_tag  <= '0;
+            cpl_rid  <= '0;
+            cpl_addr <= '0;
+            cpl_is_cfgrd <= 1'b0;
             rx_valid <= '0;
             rx_sop   <= '0;
             rx_eop   <= '0;
@@ -173,6 +181,10 @@ module pcie_endpoint #(
                 TX_IDLE: begin
                     rx_valid <= '0; rx_sop <= '0; rx_eop <= '0;
                     if (rx_st == RX_DONE && (is_cfgrd || is_memrd || is_cfgwr)) begin
+                        cpl_tag  <= rx_tag;
+                        cpl_rid  <= rx_rid;
+                        cpl_addr <= rx_addr;
+                        cpl_is_cfgrd <= is_cfgrd;
                         tx_cpl_has_data <= (is_cfgrd || is_memrd);
                         tx_st <= TX_DW0;
                     end
@@ -190,17 +202,17 @@ module pcie_endpoint #(
                 end
                 TX_DW2: begin
                     rx_eop  <= !tx_cpl_has_data;
-                    rx_data <= {rx_rid, rx_tag, 1'b0, rx_addr[6:0]};
+                    rx_data <= {cpl_rid, cpl_tag, 1'b0, cpl_addr[6:0]};
                     tx_st   <= tx_cpl_has_data ? TX_DATA : TX_WAIT;
                 end
                 TX_DATA: begin
                     rx_eop <= 1;
                     // Mux config space vs BAR0 based on the decoded request type
-                    rx_data <= is_cfgrd
-                        ? {cfg[rx_addr[7:0]+3], cfg[rx_addr[7:0]+2],
-                           cfg[rx_addr[7:0]+1], cfg[rx_addr[7:0]]}
-                        : {bar0[rx_addr[11:0]+3], bar0[rx_addr[11:0]+2],
-                           bar0[rx_addr[11:0]+1], bar0[rx_addr[11:0]]};
+                    rx_data <= cpl_is_cfgrd
+                        ? {cfg[cpl_addr[7:0]+3], cfg[cpl_addr[7:0]+2],
+                           cfg[cpl_addr[7:0]+1], cfg[cpl_addr[7:0]]}
+                        : {bar0[cpl_addr[11:0]+3], bar0[cpl_addr[11:0]+2],
+                           bar0[cpl_addr[11:0]+1], bar0[cpl_addr[11:0]]};
                     tx_st <= TX_WAIT;
                 end
                 TX_WAIT: begin
