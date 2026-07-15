@@ -1,0 +1,22 @@
+# Questa/ModelSim generated files
+work/
+work.lib
+transcript
+vsim.wlf
+*.ucdb
+*.vcd
+*.wlf
+compile.log
+*.log
+
+# Regression output directories
+sim/logs/
+sim/coverage/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS junk
+.DS_Store

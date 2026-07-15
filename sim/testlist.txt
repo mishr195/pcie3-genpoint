@@ -1,0 +1,81 @@
+# testlist.txt — PCIe Gen3 UVM Regression Test List
+# Format: test_name [seed=N] [timeout=N] [plusargs=+key=val,...]
+# Lines starting with '#' are ignored.
+# Each parameterized entry represents one of the 60+ constrained-random testcases.
+
+# ── Sanity / Base Tests (seeds 1–5) ──────────────────────────────────────────
+pcie_base_test seed=1001 timeout=120
+pcie_base_test seed=1002 timeout=120
+pcie_base_test seed=1003 timeout=120
+pcie_base_test seed=1004 timeout=120
+pcie_base_test seed=1005 timeout=120
+
+# ── Configuration Space Tests (seeds 2001–2015) ───────────────────────────────
+pcie_cfg_test seed=2001 timeout=200
+pcie_cfg_test seed=2002 timeout=200
+pcie_cfg_test seed=2003 timeout=200
+pcie_cfg_test seed=2004 timeout=200
+pcie_cfg_test seed=2005 timeout=200
+pcie_cfg_test seed=2006 timeout=200
+pcie_cfg_test seed=2007 timeout=200
+pcie_cfg_test seed=2008 timeout=200
+pcie_cfg_test seed=2009 timeout=200
+pcie_cfg_test seed=2010 timeout=200
+pcie_cfg_test seed=2011 timeout=200
+pcie_cfg_test seed=2012 timeout=200
+pcie_cfg_test seed=2013 timeout=200
+pcie_cfg_test seed=2014 timeout=200
+pcie_cfg_test seed=2015 timeout=200
+
+# ── Memory Burst Tests — varying knobs (seeds 3001–3025) ─────────────────────
+pcie_mem_burst_test seed=3001 timeout=300 plusargs=+burst_depth=4,+num_bursts=4,+dw_per_tlp=4
+pcie_mem_burst_test seed=3002 timeout=300 plusargs=+burst_depth=8,+num_bursts=4,+dw_per_tlp=8
+pcie_mem_burst_test seed=3003 timeout=300 plusargs=+burst_depth=16,+num_bursts=4,+dw_per_tlp=16
+pcie_mem_burst_test seed=3004 timeout=300 plusargs=+burst_depth=32,+num_bursts=2,+dw_per_tlp=32
+pcie_mem_burst_test seed=3005 timeout=300 plusargs=+burst_depth=4,+num_bursts=8,+dw_per_tlp=1
+pcie_mem_burst_test seed=3006 timeout=300 plusargs=+burst_depth=8,+num_bursts=8,+dw_per_tlp=2
+pcie_mem_burst_test seed=3007 timeout=300 plusargs=+burst_depth=16,+num_bursts=2,+dw_per_tlp=4
+pcie_mem_burst_test seed=3008 timeout=300 plusargs=+burst_depth=4,+num_bursts=4,+dw_per_tlp=16
+pcie_mem_burst_test seed=3009 timeout=300 plusargs=+burst_depth=2,+num_bursts=16,+dw_per_tlp=8
+pcie_mem_burst_test seed=3010 timeout=300 plusargs=+burst_depth=1,+num_bursts=32,+dw_per_tlp=4
+pcie_mem_burst_test seed=3011 timeout=300 plusargs=+burst_depth=8,+num_bursts=4,+dw_per_tlp=32
+pcie_mem_burst_test seed=3012 timeout=300 plusargs=+burst_depth=16,+num_bursts=8,+dw_per_tlp=1
+pcie_mem_burst_test seed=3013 timeout=300 plusargs=+burst_depth=32,+num_bursts=4,+dw_per_tlp=4
+pcie_mem_burst_test seed=3014 timeout=300 plusargs=+burst_depth=4,+num_bursts=2,+dw_per_tlp=32
+pcie_mem_burst_test seed=3015 timeout=300 plusargs=+burst_depth=8,+num_bursts=16,+dw_per_tlp=8
+pcie_mem_burst_test seed=3016 timeout=300 plusargs=+burst_depth=16,+num_bursts=4,+dw_per_tlp=16
+pcie_mem_burst_test seed=3017 timeout=300 plusargs=+burst_depth=32,+num_bursts=8,+dw_per_tlp=1
+pcie_mem_burst_test seed=3018 timeout=300 plusargs=+burst_depth=4,+num_bursts=32,+dw_per_tlp=2
+pcie_mem_burst_test seed=3019 timeout=300 plusargs=+burst_depth=8,+num_bursts=2,+dw_per_tlp=16
+pcie_mem_burst_test seed=3020 timeout=300 plusargs=+burst_depth=16,+num_bursts=16,+dw_per_tlp=2
+pcie_mem_burst_test seed=3021 timeout=300 plusargs=+burst_depth=32,+num_bursts=2,+dw_per_tlp=8
+pcie_mem_burst_test seed=3022 timeout=300 plusargs=+burst_depth=1,+num_bursts=64,+dw_per_tlp=1
+pcie_mem_burst_test seed=3023 timeout=300 plusargs=+burst_depth=4,+num_bursts=4,+dw_per_tlp=4
+pcie_mem_burst_test seed=3024 timeout=300 plusargs=+burst_depth=8,+num_bursts=8,+dw_per_tlp=16
+pcie_mem_burst_test seed=3025 timeout=300 plusargs=+burst_depth=16,+num_bursts=2,+dw_per_tlp=32
+
+# ── Error / Fault Injection Tests (seeds 4001–4010) ───────────────────────────
+pcie_error_test seed=4001 timeout=150
+pcie_error_test seed=4002 timeout=150
+pcie_error_test seed=4003 timeout=150
+pcie_error_test seed=4004 timeout=150
+pcie_error_test seed=4005 timeout=150
+pcie_error_test seed=4006 timeout=150
+pcie_error_test seed=4007 timeout=150
+pcie_error_test seed=4008 timeout=150
+pcie_error_test seed=4009 timeout=150
+pcie_error_test seed=4010 timeout=150
+
+# ── Stress Tests (seeds 5001–5005) ───────────────────────────────────────────
+pcie_stress_test seed=5001 timeout=600
+pcie_stress_test seed=5002 timeout=600
+pcie_stress_test seed=5003 timeout=600
+pcie_stress_test seed=5004 timeout=600
+pcie_stress_test seed=5005 timeout=600
+
+# ── Power Management Tests (seeds 6001–6005) ──────────────────────────────────
+pcie_power_mgmt_test seed=6001 timeout=300
+pcie_power_mgmt_test seed=6002 timeout=300
+pcie_power_mgmt_test seed=6003 timeout=300
+pcie_power_mgmt_test seed=6004 timeout=300
+pcie_power_mgmt_test seed=6005 timeout=300
