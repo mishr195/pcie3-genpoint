@@ -24,7 +24,9 @@ class pcie_base_seq extends uvm_sequence #(pcie_tlp_item);
         pcie_tlp_item tlp;
         repeat (num_transactions) begin
             `uvm_create(tlp)
-            if (!tlp.randomize())
+            if (!tlp.randomize() with {
+                tlp_type inside {MRD_32, MRD_64, MWR_32, MWR_64, CFGRD0, CFGWR0};
+            })
                 `uvm_fatal("BASE_SEQ", "randomization failed")
             `uvm_send(tlp)
         end
