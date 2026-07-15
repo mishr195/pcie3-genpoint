@@ -246,7 +246,7 @@ class pcie_tlp_item extends uvm_sequence_item;
     // it must be at least as large as what this TLP delivers.
     constraint c_cpl_byte_count {
         if (tlp_type inside {CPL, CPLD, CPLLK, CPLDLK}) {
-            byte_count inside {[12'd1 : 12'd4096]};
+            byte_count inside {[12'd1 : 12'hFFF]};
             byte_count >= (payload_len * 10'd4);
             lower_addr[1:0] == 2'b00;
         }

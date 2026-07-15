@@ -19,7 +19,7 @@ VERBOSITY ?= UVM_MEDIUM
 TIMEOUT   ?= 500ms
 JOBS      ?= 4
 
-VLOG_FLAGS := -sv -timescale 1ns/1ps               \
+VLOG_FLAGS := -sv -mfcu -timescale 1ns/1ps         \
               +incdir+$(UVM_HOME)/src               \
               $(UVM_HOME)/src/uvm_pkg.sv            \
               -suppress 2583
