@@ -19,6 +19,8 @@ class pcie_scoreboard extends uvm_scoreboard;
     int unsigned pass_cnt;
     int unsigned fail_cnt;
     int unsigned total;
+    pcie_tlp_item expected_q[$];
+    pcie_tlp_item actual_q[$];
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -31,13 +33,57 @@ class pcie_scoreboard extends uvm_scoreboard;
     endfunction
 
     task run_phase(uvm_phase phase);
+        fork
+            collect_expected();
+            collect_actual();
+        join
+    endtask
+
+    task collect_expected();
         pcie_tlp_item pred, actual;
+        int idx;
         forever begin
             pred_fifo.get(pred);
-            actual_fifo.get(actual);
-            check_tlp(pred, actual);
+            idx = find_actual_by_tag(pred.tag);
+            if (idx >= 0) begin
+                actual = actual_q[idx];
+                actual_q.delete(idx);
+                check_tlp(pred, actual);
+            end else begin
+                expected_q.push_back(pred);
+            end
         end
     endtask
+
+    task collect_actual();
+        pcie_tlp_item pred, actual;
+        int idx;
+        forever begin
+            actual_fifo.get(actual);
+            idx = find_expected_by_tag(actual.tag);
+            if (idx >= 0) begin
+                pred = expected_q[idx];
+                expected_q.delete(idx);
+                check_tlp(pred, actual);
+            end else begin
+                actual_q.push_back(actual);
+            end
+        end
+    endtask
+
+    function int find_expected_by_tag(bit [7:0] tag);
+        foreach (expected_q[i])
+            if (expected_q[i].tag == tag)
+                return i;
+        return -1;
+    endfunction
+
+    function int find_actual_by_tag(bit [7:0] tag);
+        foreach (actual_q[i])
+            if (actual_q[i].tag == tag)
+                return i;
+        return -1;
+    endfunction
 
     function void check_tlp(pcie_tlp_item pred, pcie_tlp_item actual);
         string mismatches;
@@ -75,6 +121,16 @@ class pcie_scoreboard extends uvm_scoreboard;
     endfunction
 
     function void report_phase(uvm_phase phase);
+        foreach (expected_q[i]) begin
+            fail_cnt++;
+            `uvm_error("SCB", $sformatf("[MISS #%0d] No actual completion for expected %s",
+                       fail_cnt, expected_q[i].convert2string()))
+        end
+        foreach (actual_q[i]) begin
+            fail_cnt++;
+            `uvm_error("SCB", $sformatf("[UNEXP #%0d] Unexpected actual completion %s",
+                       fail_cnt, actual_q[i].convert2string()))
+        end
         `uvm_info("SCB", $sformatf(
             "\n  ===== Scoreboard =====\n  Checked : %0d\n  Pass    : %0d\n  Fail    : %0d\n  =====================",
             total, pass_cnt, fail_cnt), UVM_NONE)
