@@ -48,6 +48,12 @@ class pcie_driver extends uvm_driver #(pcie_tlp_item);
     endtask
 
     task drive_tlp(pcie_tlp_item tlp);
+        bit has_payload;
+        bit is_4dw;
+
+        has_payload = tlp_has_data(tlp.tlp_type) && (tlp.payload.size() > 0);
+        is_4dw      = tlp_is_4dw(tlp.tlp_type);
+
         // Credit check first — we must not exceed the advertised credit limit
         // even if the DUT is asserting tx_ready.
         gate_on_credits(tlp.tlp_class);
@@ -72,16 +78,19 @@ class pcie_driver extends uvm_driver #(pcie_tlp_item);
         // DW2: address or config BDF/register
         @(vif.driver_cb);
         vif.driver_cb.tx_data <= (tlp.tlp_type inside {CFGRD0, CFGWR0, CFGRD1, CFGWR1})
-                                    ? build_cfg_dw2(tlp) : tlp.addr_32;
+                                    ? build_cfg_dw2(tlp) :
+                                      (is_4dw ? tlp.addr_64[31:0] : tlp.addr_32);
+        vif.driver_cb.tx_eop  <= (!has_payload && !is_4dw);
 
         // DW3: upper address word — only for 4DW header types
-        if (tlp_is_4dw(tlp.tlp_type)) begin
+        if (is_4dw) begin
             @(vif.driver_cb);
             vif.driver_cb.tx_data <= tlp.addr_64[63:32];
+            vif.driver_cb.tx_eop  <= !has_payload;
         end
 
         // Payload — last beat gets EOP and actual byte enables
-        if (tlp_has_data(tlp.tlp_type) && tlp.payload.size() > 0) begin
+        if (has_payload) begin
             foreach (tlp.payload[i]) begin
                 @(vif.driver_cb);
                 vif.driver_cb.tx_eop  <= (i == tlp.payload.size() - 1);
@@ -89,11 +98,9 @@ class pcie_driver extends uvm_driver #(pcie_tlp_item);
                 vif.driver_cb.tx_be   <= (i == tlp.payload.size() - 1) ?
                                           tlp.last_dw_be : 4'hF;
             end
-        end else begin
-            vif.driver_cb.tx_eop <= 1;
-            @(vif.driver_cb);
         end
 
+        @(vif.driver_cb);
         vif.driver_cb.tx_valid          <= 0;
         vif.driver_cb.tx_sop            <= 0;
         vif.driver_cb.tx_eop            <= 0;

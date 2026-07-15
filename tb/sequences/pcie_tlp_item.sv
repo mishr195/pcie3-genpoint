@@ -175,10 +175,12 @@ class pcie_tlp_item extends uvm_sequence_item;
             tlp_class == COMPLETION;
     }
 
-    // Zero-length field encodes 1024 DW per spec §2.2.7.
-    // Config and I/O are always exactly 1 DW; reads carry no payload at all.
+    // Keep this simplified endpoint model to one-DW read completions.
+    // Zero in the length field encodes 1024 DW, so generated reads use len=1.
     constraint c_payload_len {
-        if (tlp_type inside {MRD_32, MRD_64, MRDLK_32, MRDLK_64, IORD, CFGRD0, CFGRD1, CPL})
+        if (tlp_type inside {MRD_32, MRD_64, MRDLK_32, MRDLK_64, IORD, CFGRD0, CFGRD1})
+            payload_len == 10'd1;
+        else if (tlp_type inside {CPL})
             payload_len == 10'd0;
         else if (tlp_type inside {CFGWR0, CFGWR1, IOWR})
             payload_len == 10'd1;

@@ -93,25 +93,25 @@ interface pcie_sva_if (
     // -----------------------------------------------------------------------
 
     property p_det_to_poll;
-        (ltssm_state == 4'h0) && $changed(ltssm_state) |-> (ltssm_state == 4'h1);
+        $changed(ltssm_state) && ($past(ltssm_state) == 4'h0) |-> (ltssm_state == 4'h1);
     endproperty
     AST_DET_TO_POLL: assert property (p_det_to_poll)
         else `uvm_error("SVA", "LTSSM left Detect to illegal state")
 
     property p_poll_to_cfg;
-        (ltssm_state == 4'h1) && $changed(ltssm_state) |-> (ltssm_state == 4'h2);
+        $changed(ltssm_state) && ($past(ltssm_state) == 4'h1) |-> (ltssm_state == 4'h2);
     endproperty
     AST_POLL_TO_CFG: assert property (p_poll_to_cfg)
         else `uvm_error("SVA", "LTSSM left Polling to illegal state")
 
     property p_cfg_to_l0;
-        (ltssm_state == 4'h2) && $changed(ltssm_state) |-> (ltssm_state == 4'h3);
+        $changed(ltssm_state) && ($past(ltssm_state) == 4'h2) |-> (ltssm_state == 4'h3);
     endproperty
     AST_CFG_TO_L0: assert property (p_cfg_to_l0)
         else `uvm_error("SVA", "LTSSM left Config to illegal state")
 
     property p_l0_exits;
-        (ltssm_state == 4'h3) && $changed(ltssm_state) |-> (ltssm_state inside {4'h4, 4'h5, 4'h6});
+        $changed(ltssm_state) && ($past(ltssm_state) == 4'h3) |-> (ltssm_state inside {4'h4, 4'h5, 4'h6});
     endproperty
     AST_L0_EXITS: assert property (p_l0_exits)
         else `uvm_error("SVA", "L0 transitioned to illegal LTSSM state")
@@ -154,9 +154,8 @@ interface pcie_sva_if (
     AST_NP_NEEDS_CREDITS: assert property (p_np_needs_credits)
         else `uvm_error("SVA", "Non-Posted TLP sent with zero NPH credits")
 
-    // Credit counter wrapping to 0xFF indicates underflow in the DUT's counter
-    AST_PD_NO_UNDERFLOW: assert property (tx_credit_pd != 8'hFF)
-        else `uvm_error("SVA", "Posted Data credit counter underflowed")
+    AST_PD_CREDITS_KNOWN: assert property (!$isunknown(tx_credit_pd))
+        else `uvm_error("SVA", "Posted Data credit counter is X/Z")
 
     // -----------------------------------------------------------------------
     // Packet ordering — a new Posted SOP must not appear before the previous

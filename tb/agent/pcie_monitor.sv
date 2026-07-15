@@ -66,6 +66,14 @@ class pcie_monitor extends uvm_monitor;
                                 tlp.reg_num  = {vif.monitor_cb.tx_data[11:2], 2'b00};
                             end
                         end
+                        3: begin
+                            if (tlp_is_4dw(tlp.tlp_type))
+                                tlp.addr_64 = {vif.monitor_cb.tx_data, tlp.addr_32};
+                            else begin
+                                tlp.payload = new[tlp.payload.size() + 1](tlp.payload);
+                                tlp.payload[tlp.payload.size() - 1] = vif.monitor_cb.tx_data;
+                            end
+                        end
                         default: begin
                             // Accumulate payload — array grows one DW per beat
                             tlp.payload = new[tlp.payload.size() + 1](tlp.payload);
@@ -102,6 +110,11 @@ class pcie_monitor extends uvm_monitor;
                         tlp.completer_id = vif.monitor_cb.rx_data[31:16];
                         tlp.cpl_status   = cpl_status_e'(vif.monitor_cb.rx_data[15:13]);
                         tlp.byte_count   = vif.monitor_cb.rx_data[11:0];
+                    end else if (dw_idx == 2) begin
+                        // Completion DW2: requester ID, tag, lower address
+                        tlp.requester_id = vif.monitor_cb.rx_data[31:16];
+                        tlp.tag          = vif.monitor_cb.rx_data[15:8];
+                        tlp.lower_addr   = vif.monitor_cb.rx_data[6:0];
                     end else begin
                         tlp.payload = new[tlp.payload.size() + 1](tlp.payload);
                         tlp.payload[tlp.payload.size() - 1] = vif.monitor_cb.rx_data;

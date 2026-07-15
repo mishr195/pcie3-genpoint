@@ -111,7 +111,7 @@ module pcie_endpoint #(
     logic [31:0] rx_addr;
     logic [3:0]  rx_fbe;
 
-    logic is_cfgrd, is_cfgwr, is_memrd, is_memwr;
+    logic is_cfgrd, is_cfgwr, is_memrd, is_memwr, is_4dw_mem;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n || !link_up) begin
@@ -131,7 +131,11 @@ module pcie_endpoint #(
                 end
                 RX_DW2: begin
                     rx_addr <= tx_data;
-                    rx_st   <= (is_memwr || is_cfgwr) ? RX_DATA : RX_DONE;
+                    rx_st   <= is_4dw_mem ? RX_DW3 :
+                               ((is_memwr || is_cfgwr) ? RX_DATA : RX_DONE);
+                end
+                RX_DW3: begin
+                    rx_st <= (is_memwr || is_cfgwr) ? RX_DATA : RX_DONE;
                 end
                 RX_DATA: if (tx_eop) rx_st <= RX_DONE;
                 RX_DONE: rx_st <= RX_IDLE;
@@ -141,8 +145,9 @@ module pcie_endpoint #(
 
     assign is_cfgrd = (rx_fmt_type == 8'h04);
     assign is_cfgwr = (rx_fmt_type == 8'h44);
-    assign is_memrd = (rx_fmt_type == 8'h00);
-    assign is_memwr = (rx_fmt_type == 8'h40);
+    assign is_memrd = (rx_fmt_type == 8'h00) || (rx_fmt_type == 8'h20);
+    assign is_memwr = (rx_fmt_type == 8'h40) || (rx_fmt_type == 8'h60);
+    assign is_4dw_mem = (rx_fmt_type == 8'h20) || (rx_fmt_type == 8'h60);
 
     assign tx_bar_hit[0] = (rx_addr[31:12] == 20'h0) && (is_memrd || is_memwr);
     assign tx_bar_hit[2:1] = '0;
@@ -150,12 +155,14 @@ module pcie_endpoint #(
     // -----------------------------------------------------------------------
     // TX state machine — generate CplD for reads, Cpl for config writes
     // -----------------------------------------------------------------------
-    typedef enum logic [1:0] { TX_IDLE, TX_HDR, TX_DATA, TX_WAIT } tx_fsm_t;
+    typedef enum logic [2:0] { TX_IDLE, TX_DW0, TX_DW1, TX_DW2, TX_DATA, TX_WAIT } tx_fsm_t;
     tx_fsm_t tx_st;
+    logic    tx_cpl_has_data;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n || !link_up) begin
             tx_st    <= TX_IDLE;
+            tx_cpl_has_data <= 1'b0;
             rx_valid <= '0;
             rx_sop   <= '0;
             rx_eop   <= '0;
@@ -165,17 +172,29 @@ module pcie_endpoint #(
             case (tx_st)
                 TX_IDLE: begin
                     rx_valid <= '0; rx_sop <= '0; rx_eop <= '0;
-                    if (rx_st == RX_DONE && (is_cfgrd || is_memrd))
-                        tx_st <= TX_HDR;
+                    if (rx_st == RX_DONE && (is_cfgrd || is_memrd || is_cfgwr)) begin
+                        tx_cpl_has_data <= (is_cfgrd || is_memrd);
+                        tx_st <= TX_DW0;
+                    end
                 end
-                TX_HDR: begin
+                TX_DW0: begin
                     rx_valid <= 1; rx_sop <= 1; rx_eop <= 0;
-                    rx_data  <= 32'h4A00_0001;   // CplD, length=1
+                    rx_data  <= tx_cpl_has_data ? 32'h4A00_0001 : 32'h0A00_0000;
                     rx_be    <= 4'hF;
-                    tx_st    <= TX_DATA;
+                    tx_st    <= TX_DW1;
+                end
+                TX_DW1: begin
+                    rx_sop  <= 0; rx_eop <= 0;
+                    rx_data <= {16'h0000, 3'b000, 1'b0, tx_cpl_has_data ? 12'd4 : 12'd0};
+                    tx_st   <= TX_DW2;
+                end
+                TX_DW2: begin
+                    rx_eop  <= !tx_cpl_has_data;
+                    rx_data <= {rx_rid, rx_tag, 1'b0, rx_addr[6:0]};
+                    tx_st   <= tx_cpl_has_data ? TX_DATA : TX_WAIT;
                 end
                 TX_DATA: begin
-                    rx_sop  <= 0; rx_eop <= 1;
+                    rx_eop <= 1;
                     // Mux config space vs BAR0 based on the decoded request type
                     rx_data <= is_cfgrd
                         ? {cfg[rx_addr[7:0]+3], cfg[rx_addr[7:0]+2],
@@ -186,6 +205,7 @@ module pcie_endpoint #(
                 end
                 TX_WAIT: begin
                     rx_valid <= 0; rx_eop <= 0;
+                    tx_cpl_has_data <= 1'b0;
                     tx_st    <= TX_IDLE;
                 end
             endcase
