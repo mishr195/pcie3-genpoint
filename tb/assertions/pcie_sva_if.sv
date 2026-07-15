@@ -26,6 +26,7 @@ interface pcie_sva_if (
     input logic [7:0]  tx_credit_nph,
     input logic [7:0]  tx_credit_cplh
 );
+    import uvm_pkg::*;
 
     default clocking @(posedge clk); endclocking
     default disable iff (!rst_n);

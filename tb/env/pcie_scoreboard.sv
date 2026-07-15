@@ -35,11 +35,11 @@ class pcie_scoreboard extends uvm_scoreboard;
         forever begin
             pred_fifo.get(pred);
             actual_fifo.get(actual);
-            check(pred, actual);
+            check_tlp(pred, actual);
         end
     endtask
 
-    function void check(pcie_tlp_item pred, pcie_tlp_item actual);
+    function void check_tlp(pcie_tlp_item pred, pcie_tlp_item actual);
         string mismatches;
         bit    ok = 1;
         total++;

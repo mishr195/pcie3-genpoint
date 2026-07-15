@@ -9,6 +9,7 @@ import uvm_pkg::*;
 
 
 module tb_top;
+    import uvm_pkg::*;
 
     // Clock and reset
     localparam CLK_HALF_NS = 2;   // 250 MHz

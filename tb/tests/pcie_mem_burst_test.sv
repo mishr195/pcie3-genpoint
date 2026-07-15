@@ -20,11 +20,14 @@ class pcie_mem_burst_test extends pcie_base_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
+        string arg_value;
         super.build_phase(phase);
-        // Allow override via +define+BURST_DEPTH=N (parsed by test)
-        void'(uvm_cmdline_proc.get_arg_value("+burst_depth=",  $sformatf("%0d", burst_depth)));
-        void'(uvm_cmdline_proc.get_arg_value("+num_bursts=",   $sformatf("%0d", num_bursts)));
-        void'(uvm_cmdline_proc.get_arg_value("+dw_per_tlp=",   $sformatf("%0d", dwords_per_tlp)));
+        if (uvm_cmdline_proc.get_arg_value("+burst_depth=", arg_value))
+            void'($sscanf(arg_value, "%d", burst_depth));
+        if (uvm_cmdline_proc.get_arg_value("+num_bursts=", arg_value))
+            void'($sscanf(arg_value, "%d", num_bursts));
+        if (uvm_cmdline_proc.get_arg_value("+dw_per_tlp=", arg_value))
+            void'($sscanf(arg_value, "%d", dwords_per_tlp));
     endfunction
 
     task run_phase(uvm_phase phase);
