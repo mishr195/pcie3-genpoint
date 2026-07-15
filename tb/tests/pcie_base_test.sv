@@ -24,7 +24,7 @@ class pcie_base_test extends uvm_test;
         seq = pcie_base_seq::type_id::create("seq");
         seq.num_transactions = 20;
         seq.start(env.agent.seqr);
-        #100ns;
+        env.scoreboard.wait_for_idle(2000);
         phase.drop_objection(this);
     endtask
 

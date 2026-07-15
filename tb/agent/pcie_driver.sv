@@ -107,6 +107,10 @@ class pcie_driver extends uvm_driver #(pcie_tlp_item);
         vif.driver_cb.lcrc_error_inject <= 0;
         vif.driver_cb.ecrc_error_inject <= 0;
 
+        // This behavioral endpoint has one completion slot. Leave enough gap
+        // for any response to be emitted before launching the next request.
+        repeat (8) @(vif.driver_cb);
+
         `uvm_info("DRV", tlp.convert2string(), UVM_HIGH)
     endtask
 

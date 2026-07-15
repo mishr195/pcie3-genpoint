@@ -85,6 +85,23 @@ class pcie_scoreboard extends uvm_scoreboard;
         return -1;
     endfunction
 
+    task wait_for_idle(int unsigned timeout_ns = 1000);
+        int unsigned idle_ns = 0;
+        repeat (timeout_ns) begin
+            if ((expected_q.size() == 0) && (actual_q.size() == 0) &&
+                (pred_fifo.used() == 0) && (actual_fifo.used() == 0)) begin
+                idle_ns++;
+                if (idle_ns >= 20)
+                    return;
+            end else begin
+                idle_ns = 0;
+            end
+            #1ns;
+        end
+        `uvm_warning("SCB", $sformatf("Timed out waiting for scoreboard idle: exp_q=%0d act_q=%0d pred_fifo=%0d act_fifo=%0d",
+                     expected_q.size(), actual_q.size(), pred_fifo.used(), actual_fifo.used()))
+    endtask
+
     function void check_tlp(pcie_tlp_item pred, pcie_tlp_item actual);
         string mismatches;
         bit    ok = 1;
