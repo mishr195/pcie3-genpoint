@@ -85,8 +85,8 @@ module tb_top;
     );
 
     initial begin
-        uvm_config_db #(virtual pcie_pipe_if)::set(null, "uvm_test_top", "vif",     pipe_if);
-        uvm_config_db #(virtual pcie_sva_if) ::set(null, "uvm_test_top", "sva_vif", u_sva);
+        uvm_config_db #(virtual pcie_pipe_if)::set(null, "uvm_test_top.*", "vif",     pipe_if);
+        uvm_config_db #(virtual pcie_sva_if) ::set(null, "uvm_test_top.*", "sva_vif", u_sva);
         run_test();
     end
 
