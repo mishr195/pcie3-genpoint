@@ -224,6 +224,6 @@ module pcie_endpoint #(
         end
     end
 
-    assign tx_ready = link_up && ((rx_st != RX_IDLE) || (tx_st == TX_IDLE));
+    assign tx_ready = link_up && (tx_valid || (rx_st != RX_IDLE) || (tx_st == TX_IDLE));
 
 endmodule : pcie_endpoint
