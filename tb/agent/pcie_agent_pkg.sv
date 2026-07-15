@@ -7,7 +7,6 @@ package pcie_agent_pkg;
     `include "uvm_macros.svh"
     import pcie_tlp_types_pkg::*;
 
-    `include "pcie_tlp_item.sv"
     `include "pcie_sequencer.sv"
     `include "pcie_driver.sv"
     `include "pcie_monitor.sv"

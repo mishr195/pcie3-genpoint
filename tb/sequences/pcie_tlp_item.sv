@@ -14,6 +14,7 @@ import uvm_pkg::*;
 // without pulling in the full sequence item class.
 // ---------------------------------------------------------------------------
 package pcie_tlp_types_pkg;
+    import uvm_pkg::*;
 
     // fmt[2:0] || type[4:0] packed into one byte for easy case-matching
     typedef enum logic [7:0] {
@@ -79,9 +80,6 @@ package pcie_tlp_types_pkg;
         return (t inside {MRD_64, MRDLK_64, MWR_64});
     endfunction
 
-endpackage : pcie_tlp_types_pkg
-
-
 // ---------------------------------------------------------------------------
 // Class: pcie_tlp_item
 // Central transaction object. Every TB component — driver, monitor, scoreboard,
@@ -89,38 +87,6 @@ endpackage : pcie_tlp_types_pkg
 // correct here saves a lot of pain downstream.
 // ---------------------------------------------------------------------------
 class pcie_tlp_item extends uvm_sequence_item;
-
-    import pcie_tlp_types_pkg::*;
-
-    `uvm_object_utils_begin(pcie_tlp_item)
-        `uvm_field_enum    (tlp_type_e,      tlp_type,      UVM_ALL_ON)
-        `uvm_field_enum    (tlp_class_e,     tlp_class,     UVM_ALL_ON)
-        `uvm_field_enum    (traffic_class_e, tc,            UVM_ALL_ON)
-        `uvm_field_int     (tag,                            UVM_ALL_ON)
-        `uvm_field_int     (requester_id,                   UVM_ALL_ON)
-        `uvm_field_int     (completer_id,                   UVM_ALL_ON)
-        `uvm_field_int     (payload_len,                    UVM_ALL_ON)
-        `uvm_field_int     (addr_32,                        UVM_ALL_ON)
-        `uvm_field_int     (addr_64,                        UVM_ALL_ON)
-        `uvm_field_int     (first_dw_be,                    UVM_ALL_ON)
-        `uvm_field_int     (last_dw_be,                     UVM_ALL_ON)
-        `uvm_field_array_int(payload,                       UVM_ALL_ON)
-        `uvm_field_enum    (cpl_status_e,    cpl_status,    UVM_ALL_ON)
-        `uvm_field_int     (byte_count,                     UVM_ALL_ON)
-        `uvm_field_int     (lower_addr,                     UVM_ALL_ON)
-        `uvm_field_int     (attr,                           UVM_ALL_ON)
-        `uvm_field_int     (ep,                             UVM_ALL_ON)
-        `uvm_field_int     (td,                             UVM_ALL_ON)
-        `uvm_field_int     (ecrc,                           UVM_ALL_ON)
-        `uvm_field_int     (sequence_number,                UVM_ALL_ON)
-        `uvm_field_int     (poison_tlp,                     UVM_ALL_ON)
-        `uvm_field_int     (reg_num,                        UVM_ALL_ON)
-        `uvm_field_int     (bus_num,                        UVM_ALL_ON)
-        `uvm_field_int     (dev_num,                        UVM_ALL_ON)
-        `uvm_field_int     (func_num,                       UVM_ALL_ON)
-        `uvm_field_int     (inject_lcrc_error,              UVM_ALL_ON)
-        `uvm_field_int     (inject_ecrc_error,              UVM_ALL_ON)
-    `uvm_object_utils_end
 
     // DW0 fields
     rand tlp_type_e      tlp_type;
@@ -162,6 +128,36 @@ class pcie_tlp_item extends uvm_sequence_item;
     bit [31:0]           ecrc;
     bit                  inject_lcrc_error;
     bit                  inject_ecrc_error;
+
+    `uvm_object_utils_begin(pcie_tlp_item)
+        `uvm_field_enum    (tlp_type_e,      tlp_type,      UVM_ALL_ON)
+        `uvm_field_enum    (tlp_class_e,     tlp_class,     UVM_ALL_ON)
+        `uvm_field_enum    (traffic_class_e, tc,            UVM_ALL_ON)
+        `uvm_field_int     (tag,                            UVM_ALL_ON)
+        `uvm_field_int     (requester_id,                   UVM_ALL_ON)
+        `uvm_field_int     (completer_id,                   UVM_ALL_ON)
+        `uvm_field_int     (payload_len,                    UVM_ALL_ON)
+        `uvm_field_int     (addr_32,                        UVM_ALL_ON)
+        `uvm_field_int     (addr_64,                        UVM_ALL_ON)
+        `uvm_field_int     (first_dw_be,                    UVM_ALL_ON)
+        `uvm_field_int     (last_dw_be,                     UVM_ALL_ON)
+        `uvm_field_array_int(payload,                       UVM_ALL_ON)
+        `uvm_field_enum    (cpl_status_e,    cpl_status,    UVM_ALL_ON)
+        `uvm_field_int     (byte_count,                     UVM_ALL_ON)
+        `uvm_field_int     (lower_addr,                     UVM_ALL_ON)
+        `uvm_field_int     (attr,                           UVM_ALL_ON)
+        `uvm_field_int     (ep,                             UVM_ALL_ON)
+        `uvm_field_int     (td,                             UVM_ALL_ON)
+        `uvm_field_int     (ecrc,                           UVM_ALL_ON)
+        `uvm_field_int     (sequence_number,                UVM_ALL_ON)
+        `uvm_field_int     (poison_tlp,                     UVM_ALL_ON)
+        `uvm_field_int     (reg_num,                        UVM_ALL_ON)
+        `uvm_field_int     (bus_num,                        UVM_ALL_ON)
+        `uvm_field_int     (dev_num,                        UVM_ALL_ON)
+        `uvm_field_int     (func_num,                       UVM_ALL_ON)
+        `uvm_field_int     (inject_lcrc_error,              UVM_ALL_ON)
+        `uvm_field_int     (inject_ecrc_error,              UVM_ALL_ON)
+    `uvm_object_utils_end
 
     // -----------------------------------------------------------------------
     // Constraints
@@ -402,5 +398,7 @@ class pcie_tlp_item extends uvm_sequence_item;
     endfunction
 
 endclass : pcie_tlp_item
+
+endpackage : pcie_tlp_types_pkg
 
 `endif

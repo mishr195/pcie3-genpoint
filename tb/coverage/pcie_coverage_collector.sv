@@ -297,21 +297,22 @@ class pcie_coverage_collector extends uvm_subscriber #(pcie_tlp_item);
     endfunction
 
     function void report_phase(uvm_phase phase);
-        `uvm_info("COV", $sformatf(
-            "\n  ===== Coverage Summary =====\n"
-            "  CG1  TLP Types        : %5.1f%%\n"
-            "  CG2  Payload x Type   : %5.1f%%\n"
-            "  CG3  Traffic Class    : %5.1f%%\n"
-            "  CG4  Byte Enables     : %5.1f%%\n"
-            "  CG5  Cpl Status       : %5.1f%%\n"
-            "  CG6  Addr Range       : %5.1f%%\n"
-            "  CG7  Tag Utilization  : %5.1f%%\n"
-            "  CG8  Posted Ordering  : %5.1f%%\n"
-            "  CG9  Flow Control     : %5.1f%%\n"
-            "  CG10 LTSSM Transitions: %5.1f%%\n"
-            "  CG11 Error Injection  : %5.1f%%\n"
-            "  CG12 Burst Depth      : %5.1f%%\n"
-            "  ============================",
+        `uvm_info("COV", $sformatf({
+            "\n  ===== Coverage Summary =====\n",
+            "  CG1  TLP Types        : %5.1f%%\n",
+            "  CG2  Payload x Type   : %5.1f%%\n",
+            "  CG3  Traffic Class    : %5.1f%%\n",
+            "  CG4  Byte Enables     : %5.1f%%\n",
+            "  CG5  Cpl Status       : %5.1f%%\n",
+            "  CG6  Addr Range       : %5.1f%%\n",
+            "  CG7  Tag Utilization  : %5.1f%%\n",
+            "  CG8  Posted Ordering  : %5.1f%%\n",
+            "  CG9  Flow Control     : %5.1f%%\n",
+            "  CG10 LTSSM Transitions: %5.1f%%\n",
+            "  CG11 Error Injection  : %5.1f%%\n",
+            "  CG12 Burst Depth      : %5.1f%%\n",
+            "  ============================"
+            },
             cg_tlp_type.get_coverage(),
             cg_payload_cross.get_coverage(),
             cg_traffic_class.get_coverage(),

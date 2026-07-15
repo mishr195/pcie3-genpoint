@@ -3,6 +3,7 @@
 `define PCIE_AGENT_SV
 `include "uvm_macros.svh"
 import uvm_pkg::*;
+import pcie_tlp_types_pkg::*;
 
 typedef enum { ACTIVE, PASSIVE } agent_mode_e;
 

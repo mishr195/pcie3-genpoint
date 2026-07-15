@@ -167,7 +167,7 @@ interface pcie_sva_if (
     endsequence
 
     property p_posted_ordering;
-        s_posted_sop |-> ##[1:$] tx_eop before s_posted_sop;
+        s_posted_sop |=> !(tx_valid && tx_sop && tx_data[31:29] inside {3'b010, 3'b011}) until (tx_eop);
     endproperty
     AST_POSTED_ORDERING: assert property (p_posted_ordering)
         else `uvm_error("SVA", "Posted TLP start before previous packet EOP")
