@@ -4,6 +4,7 @@
 SHELL      := /bin/bash
 QUESTA     := /package/eda/mg/questa2021.4/questasim
 UVM_HOME   := $(QUESTA)/verilog_src/uvm-1.2
+UVM_DPI_LIB ?= $(QUESTA)/uvm-1.2/linux_x86_64/uvm_dpi
 VSIM       := $(QUESTA)/bin/vsim
 VLOG       := $(QUESTA)/bin/vlog
 VLIB       := $(QUESTA)/bin/vlib
@@ -20,11 +21,13 @@ TIMEOUT   ?= 500ms
 JOBS      ?= 4
 
 VLOG_FLAGS := -sv -mfcu -timescale 1ns/1ps         \
+              +cover=bcesft                         \
               +incdir+$(UVM_HOME)/src               \
               $(UVM_HOME)/src/uvm_pkg.sv            \
               -suppress 2583
 
 VSIM_FLAGS := -batch                                \
+              -sv_lib $(UVM_DPI_LIB)                \
               +UVM_TESTNAME=$(TEST)                 \
               +UVM_VERBOSITY=$(VERBOSITY)            \
               -sv_seed $(SEED)                       \
