@@ -2,9 +2,6 @@
 # Usage: vlog -f filelist.f
 # Order: packages → interfaces → RTL → TB components → top
 
-# ── UVM Library ───────────────────────────────────────────────────────────────
-+incdir+$UVM_HOME/src
-$UVM_HOME/src/uvm_pkg.sv
 
 # ── PCIe TLP Types Package ────────────────────────────────────────────────────
 ../tb/sequences/pcie_tlp_item.sv

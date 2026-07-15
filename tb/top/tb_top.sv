@@ -6,9 +6,7 @@
 `timescale 1ns/1ps
 `include "uvm_macros.svh"
 import uvm_pkg::*;
-`include "pcie_tlp_item.sv"
-`include "pcie_pipe_if.sv"
-`include "pcie_sva_if.sv"
+
 
 module tb_top;
 

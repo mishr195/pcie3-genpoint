@@ -17,7 +17,7 @@ class pcie_error_test extends pcie_base_test;
     task run_phase(uvm_phase phase);
         phase.raise_objection(this);
         // Cycle through all error modes: each run exercises a different fault
-        foreach (error_type_e errs[i]) begin
+        for (int i = 0; i < 6; i++) begin
             err_seq = pcie_error_injection_seq::type_id::create("err_seq");
             err_seq.error_mode    = error_type_e'(i);
             err_seq.num_error_tlps= 3;

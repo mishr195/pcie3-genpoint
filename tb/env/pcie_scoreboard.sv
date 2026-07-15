@@ -76,11 +76,7 @@ class pcie_scoreboard extends uvm_scoreboard;
 
     function void report_phase(uvm_phase phase);
         `uvm_info("SCB", $sformatf(
-            "\n  ===== Scoreboard =====\n"
-            "  Checked : %0d\n"
-            "  Pass    : %0d\n"
-            "  Fail    : %0d\n"
-            "  =====================",
+            "\n  ===== Scoreboard =====\n  Checked : %0d\n  Pass    : %0d\n  Fail    : %0d\n  =====================",
             total, pass_cnt, fail_cnt), UVM_NONE)
         if (fail_cnt > 0)
             `uvm_error("SCB", "SIMULATION FAILED")

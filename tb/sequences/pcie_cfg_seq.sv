@@ -24,13 +24,13 @@ class pcie_cfg_seq extends pcie_base_seq;
     task body();
         pcie_tlp_item tlp;
 
-        for (int reg = start_reg; reg <= end_reg; reg++) begin
+        for (int r = start_reg; r <= end_reg; r++) begin
 
             if (do_write_first) begin
                 `uvm_create(tlp)
                 assert(tlp.randomize() with {
                     tlp_type    == CFGWR0;
-                    reg_num     == (reg * 4);
+                    reg_num     == (r * 4);
                     bus_num     == 8'h00;
                     dev_num     == 5'h00;
                     func_num    == 3'h0;
@@ -44,7 +44,7 @@ class pcie_cfg_seq extends pcie_base_seq;
             `uvm_create(tlp)
             assert(tlp.randomize() with {
                 tlp_type    == CFGRD0;
-                reg_num     == (reg * 4);
+                reg_num     == (r * 4);
                 bus_num     == 8'h00;
                 dev_num     == 5'h00;
                 func_num    == 3'h0;

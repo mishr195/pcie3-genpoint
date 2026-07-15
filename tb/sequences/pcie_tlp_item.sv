@@ -5,6 +5,9 @@
 `ifndef PCIE_TLP_ITEM_SV
 `define PCIE_TLP_ITEM_SV
 
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
 // ---------------------------------------------------------------------------
 // Package: pcie_tlp_types_pkg
 // Keep all enums and helpers here so every TB layer imports the same types

@@ -6,6 +6,9 @@
 `ifndef PCIE_SVA_IF_SV
 `define PCIE_SVA_IF_SV
 
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
 interface pcie_sva_if (
     input logic        clk,
     input logic        rst_n,
