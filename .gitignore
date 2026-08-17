@@ -1,13 +1,19 @@
-# Questa/ModelSim generated files
+# Questa / ModelSim / VCS / Xcelium generated files
 work/
 work.lib
 transcript
 vsim.wlf
+simv
+simv.daidir/
+csrc/
+ucli.key
 *.ucdb
 *.vcd
 *.wlf
-compile.log
+*.vpd
+*.fsdb
 *.log
+compile.log
 
 # Regression output directories
 sim/logs/
@@ -20,3 +26,17 @@ __pycache__/
 
 # macOS junk
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor swap / backup files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Generated artifacts
+output/
+tmp/
+*.pdf
